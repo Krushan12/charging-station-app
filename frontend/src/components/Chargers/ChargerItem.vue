@@ -78,7 +78,7 @@ const handleDelete = () => {
   color: #155724;
 }
 
-.status-badge['in-use'] {
+.status-badge.in-use {
   background-color: #fff3cd;
   color: #856404;
 }
