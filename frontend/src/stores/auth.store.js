@@ -1,9 +1,6 @@
 import { defineStore } from 'pinia';
 import apiClient from '../services/api.js';
-import router from '../router'; // To navigate after login/logout
-
-// Define the backend API URL from environment variables or hardcode for now
-const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:3000/api'; // Adjust if your backend runs elsewhere
+import router from '../router';
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -23,25 +20,27 @@ export const useAuthStore = defineStore('auth', {
             this.loading = true;
             this.error = null;
             try {
-                // As per assignment: Login API (Issue JWT token) [cite: 6]
-                const response = await apiClient.post(`${BACKEND_URL}/auth/login`, credentials);
-                const { token, user } = response.data; // Assuming backend returns token and user info
-
+                const response = await apiClient.post('/auth/login', credentials);
+                const { token } = response.data;
+                
                 this.token = token;
-                this.user = user;
-
                 localStorage.setItem('token', token);
-                localStorage.setItem('user', JSON.stringify(user));
-
-                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set auth header for subsequent requests
-
-                router.push({ name: 'ChargerList' }); // Navigate to charger list page
+                
+                // Set the token in API client headers
+                apiClient.defaults.headers['Authorization'] = `Bearer ${token}`;
+                
+                // Then fetch user data
+                const userResponse = await apiClient.get('/auth/me');
+                this.user = userResponse.data.data;
+                localStorage.setItem('user', JSON.stringify(this.user));
+                
+                router.push('/');
             } catch (err) {
-                this.error = err.response?.data?.message || 'Login failed. Please check your credentials.';
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
+                this.error = err.response?.data?.error || 'Login failed';
                 this.token = null;
                 this.user = null;
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
             } finally {
                 this.loading = false;
             }
@@ -50,10 +49,7 @@ export const useAuthStore = defineStore('auth', {
             this.loading = true;
             this.error = null;
             try {
-                // As per assignment: Register (Signup) API [cite: 6]
-                await axios.post(`${BACKEND_URL}/auth/register`, userData);
-                // Optionally log the user in directly after signup or redirect to login
-                // For now, let's assume they need to login after signup
+                await apiClient.post('/auth/register', userData);
                 router.push({ name: 'Login', query: { registered: 'true' } });
             } catch (err) {
                 this.error = err.response?.data?.message || 'Signup failed. Please try again.';
@@ -66,13 +62,11 @@ export const useAuthStore = defineStore('auth', {
             this.user = null;
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            delete axios.defaults.headers.common['Authorization'];
             router.push({ name: 'Login' });
         },
-        // Action to initialize auth header if token exists on page load
         initializeAuthHeader() {
             if (this.token) {
-                axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
+                apiClient.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
             }
         }
     },

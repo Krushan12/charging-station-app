@@ -16,10 +16,10 @@ export const useChargerStore = defineStore('charger', () => {
         loading.value = true;
         error.value = null;
         try {
-            const response = await apiClient.get('/chargers');
-            chargers.value = response.data;
+            const response = await apiClient.get('/charging-stations');
+            chargers.value = response.data.data;
         } catch (err) {
-            error.value = err.response?.data?.message || 'Failed to fetch chargers';
+            error.value = err.response?.data?.error || 'Failed to fetch chargers';
         } finally {
             loading.value = false;
         }
@@ -29,11 +29,11 @@ export const useChargerStore = defineStore('charger', () => {
         loading.value = true;
         error.value = null;
         try {
-            const response = await apiClient.post('/chargers', chargerData);
-            chargers.value.push(response.data);
-            return response.data;
+            const response = await apiClient.post('/charging-stations', chargerData);
+            chargers.value.push(response.data.data);
+            return response.data.data;
         } catch (err) {
-            error.value = err.response?.data?.message || 'Failed to add charger';
+            error.value = err.response?.data?.error || 'Failed to add charger';
             throw err;
         } finally {
             loading.value = false;
@@ -44,14 +44,14 @@ export const useChargerStore = defineStore('charger', () => {
         loading.value = true;
         error.value = null;
         try {
-            const response = await apiClient.put(`/chargers/${id}`, chargerData);
+            const response = await apiClient.put(`/charging-stations/${id}`, chargerData);
             const index = chargers.value.findIndex(c => c._id === id);
             if (index !== -1) {
-                chargers.value[index] = response.data;
+                chargers.value[index] = response.data.data;
             }
-            return response.data;
+            return response.data.data;
         } catch (err) {
-            error.value = err.response?.data?.message || 'Failed to update charger';
+            error.value = err.response?.data?.error || 'Failed to update charger';
             throw err;
         } finally {
             loading.value = false;
@@ -62,10 +62,25 @@ export const useChargerStore = defineStore('charger', () => {
         loading.value = true;
         error.value = null;
         try {
-            await apiClient.delete(`/chargers/${id}`);
+            await apiClient.delete(`/charging-stations/${id}`);
             chargers.value = chargers.value.filter(c => c._id !== id);
         } catch (err) {
-            error.value = err.response?.data?.message || 'Failed to delete charger';
+            error.value = err.response?.data?.error || 'Failed to delete charger';
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const fetchChargersInRadius = async (lat, lng, distance) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const response = await apiClient.get(`/charging-stations/radius/${lat}/${lng}/${distance}`);
+            chargers.value = response.data.data;
+            return response.data.data;
+        } catch (err) {
+            error.value = err.response?.data?.error || 'Failed to fetch nearby chargers';
             throw err;
         } finally {
             loading.value = false;
@@ -91,6 +106,7 @@ export const useChargerStore = defineStore('charger', () => {
         addCharger,
         updateCharger,
         deleteCharger,
-        filteredChargers
+        filteredChargers,
+        fetchChargersInRadius
     };
 });
