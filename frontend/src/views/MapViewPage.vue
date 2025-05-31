@@ -77,7 +77,6 @@ onMounted(() => {
             <div class="charger-popup-details">
               <p><strong>Type:</strong> ${charger.connectorType}</p>
               <p><strong>Power Output:</strong> ${charger.powerOutput} kW</p>
-              <p><strong>Price:</strong> $${charger.pricePerHour}/hour</p>
             </div>
           </div>
         `;

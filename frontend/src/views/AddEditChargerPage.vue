@@ -42,24 +42,14 @@
 
 
 
-      <div class="form-group">
-        <label for="location">Location Address (Optional if coordinates provided)</label>
-        <input 
-          type="text" 
-          id="location" 
-          v-model="formData.location" 
-          placeholder="Enter location address"
-        />
-        <span v-if="errors.location" class="error-message">{{ errors.location }}</span>
-      </div>
-
       <div class="form-row">
         <div class="form-group">
-          <label for="latitude">Latitude (Optional if location provided)</label>
+          <label for="latitude">Latitude</label>
           <input 
             type="number" 
             id="latitude" 
             v-model.number="formData.latitude" 
+            required
             step="any"
             min="-90"
             max="90"
@@ -68,11 +58,12 @@
           <span v-if="errors.latitude" class="error-message">{{ errors.latitude }}</span>
         </div>
         <div class="form-group">
-          <label for="longitude">Longitude (Optional if location provided)</label>
+          <label for="longitude">Longitude</label>
           <input 
             type="number" 
             id="longitude" 
             v-model.number="formData.longitude" 
+            required
             step="any"
             min="-180"
             max="180"
@@ -83,10 +74,14 @@
       </div>
 
       <div class="form-group">
-        <label for="status">Status</label>      <select id="status" v-model="formData.status" required>
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
-      </select>
+        <label for="status">Status</label>
+        <div class="status-select-container">
+          <select id="status" v-model="formData.status" required class="status-select">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <div class="status-indicator" :class="formData.status"></div>
+        </div>
       </div>
 
       <div class="form-actions">
@@ -272,6 +267,45 @@ const handleSubmit = async () => {
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 2rem;
+}
+
+.status-select-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-select {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 1rem;
+  appearance: none;
+  background-color: white;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23333' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 12px 12px;
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: -30px;
+  pointer-events: none;
+}
+
+.status-indicator.active {
+  background-color: #34d399;
+  box-shadow: 0 0 0 2px #d1fae5;
+}
+
+.status-indicator.inactive {
+  background-color: #f87171;
+  box-shadow: 0 0 0 2px #fee2e2;
 }
 
 .submit-btn {

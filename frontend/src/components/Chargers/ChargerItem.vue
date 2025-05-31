@@ -78,19 +78,16 @@ const handleDelete = () => {
   text-transform: capitalize;
 }
 
-.status-badge.available {
-  background-color: #d4edda;
-  color: #155724;
+.status-badge.active {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #34d399;
 }
 
-.status-badge.in-use {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.status-badge.maintenance {
-  background-color: #f8d7da;
-  color: #721c24;
+.status-badge.inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #f87171;
 }
 
 .charger-details {
