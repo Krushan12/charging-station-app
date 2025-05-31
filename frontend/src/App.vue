@@ -1,7 +1,7 @@
 <template>
   <div id="app-container">
     <Navbar v-if="showNavbar" />
-    <main class="container mx-auto p-4">
+    <main class="main-content">
       <router-view />
     </main>
   </div>
@@ -33,13 +33,20 @@ body {
 }
 
 #app-container {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  background: #f5f7fa;
 }
 
-main.container {
-  flex-grow: 1;
+.main-content {
+  flex: 1;
+  position: relative;
+  height: calc(100vh - 64px);
+}
+
+.router-view {
+  height: 100%;
 }
 
 /* Basic button styling */
