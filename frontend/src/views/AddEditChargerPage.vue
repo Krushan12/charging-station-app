@@ -27,81 +27,66 @@
       </div>
 
       <div class="form-group">
-        <label for="location">Location</label>
+        <label for="powerOutput">Power Output (kW)</label>
+        <input 
+          type="number" 
+          id="powerOutput" 
+          v-model.number="formData.powerOutput" 
+          required 
+          min="1"
+          step="0.1"
+          placeholder="Enter power in kW"
+        />
+        <span v-if="errors.powerOutput" class="error-message">{{ errors.powerOutput }}</span>
+      </div>
+
+
+
+      <div class="form-group">
+        <label for="location">Location Address (Optional if coordinates provided)</label>
         <input 
           type="text" 
           id="location" 
           v-model="formData.location" 
-          required 
-          placeholder="Enter location"
+          placeholder="Enter location address"
         />
+        <span v-if="errors.location" class="error-message">{{ errors.location }}</span>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="powerOutput">Power Output (kW)</label>
-          <input 
-            type="number" 
-            id="powerOutput" 
-            v-model.number="formData.powerOutput" 
-            required 
-            min="1"
-            step="0.1"
-            placeholder="Enter power in kW"
-          />
-          <span v-if="errors.powerOutput" class="error-message">{{ errors.powerOutput }}</span>
-        </div>
-
-        <div class="form-group">
-          <label for="price">Price per Hour ($)</label>
-          <input 
-            type="number" 
-            id="price" 
-            v-model.number="formData.pricePerHour" 
-            required 
-            min="0"
-            step="0.01"
-            placeholder="Enter price per hour"
-          />
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="latitude">Latitude</label>
+          <label for="latitude">Latitude (Optional if location provided)</label>
           <input 
             type="number" 
             id="latitude" 
             v-model.number="formData.latitude" 
-            required 
             step="any"
             min="-90"
             max="90"
             placeholder="Enter latitude"
           />
+          <span v-if="errors.latitude" class="error-message">{{ errors.latitude }}</span>
         </div>
         <div class="form-group">
-          <label for="longitude">Longitude</label>
+          <label for="longitude">Longitude (Optional if location provided)</label>
           <input 
             type="number" 
             id="longitude" 
             v-model.number="formData.longitude" 
-            required 
             step="any"
             min="-180"
             max="180"
             placeholder="Enter longitude"
           />
+          <span v-if="errors.longitude" class="error-message">{{ errors.longitude }}</span>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="status">Status</label>
-        <select id="status" v-model="formData.status" required>
-          <option value="available">Available</option>
-          <option value="in-use">In Use</option>
-          <option value="maintenance">Maintenance</option>
-        </select>
+        <label for="status">Status</label>      <select id="status" v-model="formData.status" required>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
       </div>
 
       <div class="form-actions">
@@ -131,14 +116,24 @@ const isEditMode = computed(() => route.name === 'EditCharger');
 
 const formData = ref({
   name: '',
-  connectorType: 'Level 1', // Set default value
-  location: '',
-  powerOutput: 1, // Set minimum valid value
-  pricePerHour: 0,
-  status: 'available',
+  connectorType: '',
+  powerOutput: 1,
+  status: 'active',
   latitude: 0,
   longitude: 0
 });
+
+// Function to populate form data from charger
+const populateFormData = (charger) => {
+  formData.value = {
+    name: charger.name,
+    connectorType: charger.connectorType,
+    powerOutput: charger.powerOutput,
+    status: charger.status,
+    latitude: charger.location?.coordinates ? charger.location.coordinates[1] : 0,
+    longitude: charger.location?.coordinates ? charger.location.coordinates[0] : 0
+  };
+};
 
 const errors = ref({});
 
@@ -156,7 +151,26 @@ const validateForm = () => {
   if (!formData.value.powerOutput || formData.value.powerOutput < 1) {
     errors.value.powerOutput = 'Power output must be at least 1 kW';
   }
-  
+
+  if (formData.value.pricePerHour < 0) {
+    errors.value.pricePerHour = 'Price cannot be negative';
+  }
+
+  // Location validation
+  const hasLocation = !!formData.value.location;
+  const hasValidCoordinates = (
+    typeof formData.value.latitude === 'number' && 
+    typeof formData.value.longitude === 'number' &&
+    formData.value.latitude >= -90 && 
+    formData.value.latitude <= 90 && 
+    formData.value.longitude >= -180 && 
+    formData.value.longitude <= 180
+  );
+
+  if (!hasLocation && !hasValidCoordinates) {
+    errors.value.location = 'Please provide either a location address or valid coordinates';
+  }
+
   return Object.keys(errors.value).length === 0;
 };
 
@@ -167,7 +181,7 @@ onMounted(async () => {
     await chargerStore.fetchChargers();
     const charger = chargerStore.chargers.find(c => c._id === chargerId);
     if (charger) {
-      formData.value = { ...charger };
+      populateFormData(charger);
     }
   }
 });
@@ -180,33 +194,32 @@ const handleSubmit = async () => {
       return;
     }
 
-    // Convert and validate power output
-    const powerOutput = Number(formData.value.powerOutput);
-    if (isNaN(powerOutput) || powerOutput < 1) {
-      errors.value.powerOutput = 'Power output must be at least 1 kW';
-      return;
-    }
-
-    // Validate connector type
-    if (!['Level 1', 'Level 2', 'DC Fast'].includes(formData.value.connectorType)) {
-      errors.value.connectorType = 'Please select a valid connector type';
-      return;
-    }
-
     const chargerData = {
       name: formData.value.name.trim(),
-      powerOutput: powerOutput,
+      powerOutput: Number(formData.value.powerOutput),
       connectorType: formData.value.connectorType,
-      status: formData.value.status.toLowerCase(),
+      status: formData.value.status,
       location: {
         type: 'Point',
-        coordinates: [Number(formData.value.longitude), Number(formData.value.latitude)]
+        coordinates: [
+          Number(formData.value.longitude),
+          Number(formData.value.latitude)
+        ]
       }
     };
 
-    console.log('Prepared charger data:', chargerData);
-
-    console.log('Submitting charger data:', chargerData);
+    // Handle location data
+    chargerData.location = {
+      type: 'Point',
+      coordinates: [
+        Number(formData.value.longitude || 0),
+        Number(formData.value.latitude || 0)
+      ]
+    };
+    
+    if (formData.value.location) {
+      chargerData.locationText = formData.value.location;
+    }
 
     if (isEditMode.value) {
       await chargerStore.updateCharger(route.params.id, chargerData);
@@ -216,6 +229,17 @@ const handleSubmit = async () => {
     router.push('/');
   } catch (error) {
     console.error('Error saving charger:', error.response?.data || error);
+    if (error.response?.data?.errors) {
+      error.response.data.errors.forEach(err => {
+        if (err.param) {
+          errors.value[err.param] = err.msg;
+        } else {
+          errors.value.serverError = err.msg || 'An error occurred while saving';
+        }
+      });
+    } else {
+      errors.value.serverError = error.response?.data?.error || 'An error occurred while saving';
+    }
   }
 };
 </script>

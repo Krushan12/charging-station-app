@@ -10,7 +10,6 @@
       <p><strong>Type:</strong> {{ charger.connectorType }}</p>
       <p><strong>Location:</strong> {{ formatLocation(charger.location) }}</p>
       <p><strong>Power (kW):</strong> {{ charger.powerOutput }}</p>
-      <p><strong>Price:</strong> ${{ charger.pricePerHour || 0 }}/hour</p>
     </div>
     <div class="charger-actions">
       <button @click="handleEdit" class="edit-btn">Edit</button>

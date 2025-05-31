@@ -39,10 +39,12 @@
 
 <script setup>
 import { computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useChargerStore } from '../stores/charger.store';
 import ChargerItem from '../components/Chargers/ChargerItem.vue';
 import ChargerFilter from '../components/Chargers/ChargerFilter.vue';
 
+const router = useRouter();
 const chargerStore = useChargerStore();
 
 onMounted(() => {

@@ -8,8 +8,8 @@ export const useChargerStore = defineStore('charger', () => {
     const error = ref(null);
     const filters = ref({
         status: '',
-        type: '',
-        location: ''
+        power: '',
+        type: ''
     });
 
     const fetchChargers = async () => {
@@ -57,7 +57,19 @@ export const useChargerStore = defineStore('charger', () => {
         loading.value = true;
         error.value = null;
         try {
-            const response = await apiClient.put(`/charging-stations/${id}`, chargerData);
+            // Format the data before sending
+            const formattedData = {
+                ...chargerData,
+                powerOutput: Number(chargerData.powerOutput),
+                location: chargerData.location.coordinates 
+                    ? {
+                        type: 'Point',
+                        coordinates: chargerData.location.coordinates.map(Number)
+                      }
+                    : chargerData.location // Use the location as is if no coordinates
+            };
+
+            const response = await apiClient.put(`/charging-stations/${id}`, formattedData);
             const index = chargers.value.findIndex(c => c._id === id);
             if (index !== -1) {
                 chargers.value[index] = response.data.data;

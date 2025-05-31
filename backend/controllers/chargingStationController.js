@@ -115,12 +115,34 @@ exports.createChargingStation = async (req, res, next) => {
 // @route   PUT /api/charging-stations/:id
 // @access  Private
 exports.updateChargingStation = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
+    // Basic validation
+    if (!req.body.name || !req.body.powerOutput || !req.body.connectorType || !req.body.status) {
+      return res.status(400).json({
+        success: false,
+        errors: [{ msg: 'Please provide all required fields' }]
+      });
+    }
+
+    // Validate power output
+    const powerOutput = Number(req.body.powerOutput);
+    if (isNaN(powerOutput) || powerOutput < 1) {
+      return res.status(400).json({
+        success: false,
+        errors: [{ param: 'powerOutput', msg: 'Power output must be at least 1 kW' }]
+      });
+    }
+
+    // Validate location
+    if (!req.body.location || 
+        (req.body.location.type !== 'text' && 
+         (!req.body.location.coordinates || req.body.location.coordinates.length !== 2))) {
+      return res.status(400).json({
+        success: false,
+        errors: [{ param: 'location', msg: 'Invalid location format' }]
+      });
+    }
+
     let chargingStation = await ChargingStation.findById(req.params.id);
     
     if (!chargingStation) {
@@ -138,15 +160,26 @@ exports.updateChargingStation = async (req, res, next) => {
       });
     }
     
-    // Update location if provided
-    if (req.body.longitude && req.body.latitude) {
-      req.body.location = {
+    // Format the update data
+    let updateData = {
+      ...req.body,
+      powerOutput: Number(req.body.powerOutput),
+      pricePerHour: Number(req.body.pricePerHour || 0),
+      location: {
         type: 'Point',
-        coordinates: [req.body.longitude, req.body.latitude]
-      };
+        coordinates: [
+          Number(req.body.location.coordinates[0]) || 0,
+          Number(req.body.location.coordinates[1]) || 0
+        ]
+      }
+    };
+
+    // Handle text location if provided
+    if (req.body.locationText) {
+      updateData.locationText = req.body.locationText;
     }
     
-    chargingStation = await ChargingStation.findByIdAndUpdate(req.params.id, req.body, {
+    chargingStation = await ChargingStation.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true
     });

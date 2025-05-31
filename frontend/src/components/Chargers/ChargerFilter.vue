@@ -4,9 +4,8 @@
       <label for="status-filter">Status:</label>
       <select id="status-filter" v-model="localFilters.status" class="form-select">
         <option value="">All Statuses</option>
-        <option value="available">Available</option>
-        <option value="in-use">In Use</option>
-        <option value="maintenance">Maintenance</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
       </select>
     </div>
 
@@ -20,16 +19,7 @@
       </select>
     </div>
 
-    <div class="filter-group">
-      <label for="location-filter">Location:</label>
-      <input 
-        type="text" 
-        id="location-filter" 
-        v-model="localFilters.location" 
-        placeholder="Search by coordinates (e.g., 40.7128, -74.006)"
-        class="form-input"
-      />
-    </div>
+
   </div>
 </template>
 
@@ -44,7 +34,7 @@ const props = defineProps({
     default: () => ({
       status: '',
       type: '',
-      location: ''
+      power: ''
     })
   }
 });
@@ -52,7 +42,7 @@ const props = defineProps({
 const localFilters = ref({
   status: props.initialFilters.status,
   type: props.initialFilters.type,
-  location: props.initialFilters.location
+  power: props.initialFilters.power
 });
 
 // Debounce the filter changes to prevent too many updates
@@ -63,7 +53,7 @@ watch(localFilters, (newFilters) => {
     emit('filter-changed', {
       status: newFilters.status,
       type: newFilters.type,
-      location: newFilters.location.trim()
+      power: newFilters.power
     });
   }, 300);
 }, { deep: true });

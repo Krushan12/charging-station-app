@@ -28,8 +28,8 @@ const chargingStationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['available', 'in-use', 'maintenance'],
-    default: 'available'
+    enum: ['active', 'inactive'],
+    default: 'active'
   },
   powerOutput: {
     type: Number,
