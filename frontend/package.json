@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "vite preview --port $PORT",
+    "vercel-build": "vite build"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
