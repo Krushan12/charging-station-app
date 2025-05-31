@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#0EA5E9"/>
+  
+  <!-- Charging station shape -->
+  <path d="M10 8C10 7.44772 10.4477 7 11 7H21C21.5523 7 22 7.44772 22 8V24C22 24.5523 21.5523 25 21 25H11C10.4477 25 10 24.5523 10 24V8Z" fill="white"/>
+  
+  <!-- Lightning bolt -->
+  <path d="M17.5 11L13 16H16L14.5 21L19 16H16L17.5 11Z" fill="#0EA5E9"/>
+  
+  <!-- Connector base -->
+  <rect x="14" y="22" width="4" height="2" fill="#0EA5E9"/>
+</svg>
