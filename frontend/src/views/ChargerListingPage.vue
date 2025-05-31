@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useChargerStore } from '../stores/charger.store';
 import ChargerItem from '../components/Chargers/ChargerItem.vue';
@@ -65,11 +65,17 @@ const handleFilterChange = (filters) => {
 };
 
 const clearFilters = () => {
+  // Update the store filters
   chargerStore.filters = {
     status: '',
     type: '',
     power: ''
   };
+  
+  // Force a re-render of the filter component by updating the key
+  nextTick(() => {
+    handleFilterChange(chargerStore.filters);
+  });
 };
 
 const handleEdit = (id) => {

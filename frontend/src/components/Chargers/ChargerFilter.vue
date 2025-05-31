@@ -77,6 +77,15 @@ watch(localFilters, (newFilters) => {
     });
   }, 300);
 }, { deep: true });
+
+// Watch for changes in initialFilters
+watch(() => props.initialFilters, (newFilters) => {
+  localFilters.value = {
+    status: newFilters.status,
+    type: newFilters.type,
+    power: newFilters.power
+  };
+}, { deep: true });
 </script>
 
 <style scoped>
