@@ -19,6 +19,19 @@
       </select>
     </div>
 
+    <div class="filter-group">
+      <label for="power-filter">Power Output</label>
+      <select id="power-filter" v-model="localFilters.power" class="form-select">
+        <option 
+          v-for="option in powerOptions" 
+          :key="option.value" 
+          :value="option.value"
+        >
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
 
   </div>
 </template>
@@ -44,6 +57,13 @@ const localFilters = ref({
   type: props.initialFilters.type,
   power: props.initialFilters.power
 });
+
+const powerOptions = [
+  { value: '', label: 'All Power Outputs' },
+  { value: 'low', label: 'Less than 20 kW' },
+  { value: 'medium', label: '20-50 kW' },
+  { value: 'high', label: 'More than 50 kW' }
+];
 
 // Debounce the filter changes to prevent too many updates
 let debounceTimer;
@@ -89,6 +109,9 @@ label {
   padding: 0.75rem;
   border: 1px solid #ced4da;
   border-radius: 6px;
+  background-color: white;
+  min-width: 200px;
+  cursor: pointer;
   font-size: 1rem;
   color: #495057;
   background-color: white;

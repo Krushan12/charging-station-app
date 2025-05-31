@@ -57,7 +57,7 @@ const filteredChargers = computed(() => {
 
 const hasActiveFilters = computed(() => {
   const filters = chargerStore.filters;
-  return filters.status !== '' || filters.type !== '' || filters.location !== '';
+  return filters.status !== '' || filters.type !== '' || filters.power !== '';
 });
 
 const handleFilterChange = (filters) => {
@@ -68,7 +68,7 @@ const clearFilters = () => {
   chargerStore.filters = {
     status: '',
     type: '',
-    location: ''
+    power: ''
   };
 };
 

@@ -114,15 +114,33 @@ export const useChargerStore = defineStore('charger', () => {
 
     const filteredChargers = () => {
         return chargers.value.filter(charger => {
-            const locationMatch = !filters.value.location || 
-                (charger.location?.coordinates && 
-                 `${charger.location.coordinates[1]}, ${charger.location.coordinates[0]}`.includes(filters.value.location));
-            
-            return (
-                (!filters.value.status || charger.status === filters.value.status) &&
-                (!filters.value.type || charger.connectorType === filters.value.type) &&
-                locationMatch
-            );
+            // Status filter
+            if (filters.value.status && charger.status !== filters.value.status) {
+                return false;
+            }
+
+            // Type filter
+            if (filters.value.type && charger.connectorType !== filters.value.type) {
+                return false;
+            }
+
+            // Power output filter
+            if (filters.value.power) {
+                const power = Number(charger.powerOutput);
+                switch (filters.value.power) {
+                    case 'low':
+                        if (power >= 20) return false;
+                        break;
+                    case 'medium':
+                        if (power < 20 || power > 50) return false;
+                        break;
+                    case 'high':
+                        if (power <= 50) return false;
+                        break;
+                }
+            }
+
+            return true;
         });
     };
 
@@ -135,7 +153,7 @@ export const useChargerStore = defineStore('charger', () => {
         addCharger,
         updateCharger,
         deleteCharger,
-        filteredChargers,
-        fetchChargersInRadius
+        fetchChargersInRadius,
+        filteredChargers
     };
 });
