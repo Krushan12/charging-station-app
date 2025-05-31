@@ -17,9 +17,10 @@ export const useChargerStore = defineStore('charger', () => {
         error.value = null;
         try {
             const response = await apiClient.get('/charging-stations');
-            chargers.value = response.data.data;
+            chargers.value = response.data.data || [];
         } catch (err) {
             error.value = err.response?.data?.error || 'Failed to fetch chargers';
+            throw err;
         } finally {
             loading.value = false;
         }
@@ -29,9 +30,21 @@ export const useChargerStore = defineStore('charger', () => {
         loading.value = true;
         error.value = null;
         try {
-            const response = await apiClient.post('/charging-stations', chargerData);
-            chargers.value.push(response.data.data);
-            return response.data.data;
+            console.log('Store received data:', chargerData);
+            const formattedData = {
+                ...chargerData,
+                powerOutput: Number(chargerData.powerOutput),
+                location: {
+                    type: 'Point',
+                    coordinates: chargerData.location.coordinates.map(Number)
+                }
+            };
+            console.log('Store sending data:', formattedData);
+
+            const response = await apiClient.post('/charging-stations', formattedData);
+            const newCharger = response.data.data;
+            chargers.value.push(newCharger);
+            return newCharger;
         } catch (err) {
             error.value = err.response?.data?.error || 'Failed to add charger';
             throw err;
@@ -89,10 +102,14 @@ export const useChargerStore = defineStore('charger', () => {
 
     const filteredChargers = () => {
         return chargers.value.filter(charger => {
+            const locationMatch = !filters.value.location || 
+                (charger.location?.coordinates && 
+                 `${charger.location.coordinates[1]}, ${charger.location.coordinates[0]}`.includes(filters.value.location));
+            
             return (
                 (!filters.value.status || charger.status === filters.value.status) &&
-                (!filters.value.type || charger.type === filters.value.type) &&
-                (!filters.value.location || charger.location.toLowerCase().includes(filters.value.location.toLowerCase()))
+                (!filters.value.type || charger.connectorType === filters.value.type) &&
+                locationMatch
             );
         });
     };

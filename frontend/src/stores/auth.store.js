@@ -21,19 +21,17 @@ export const useAuthStore = defineStore('auth', {
             this.error = null;
             try {
                 const response = await apiClient.post('/auth/login', credentials);
-                const { token } = response.data;
+                const { token, data: user } = response.data;
                 
                 this.token = token;
+                this.user = user;
+
                 localStorage.setItem('token', token);
-                
-                // Set the token in API client headers
-                apiClient.defaults.headers['Authorization'] = `Bearer ${token}`;
-                
-                // Then fetch user data
-                const userResponse = await apiClient.get('/auth/me');
-                this.user = userResponse.data.data;
-                localStorage.setItem('user', JSON.stringify(this.user));
-                
+                localStorage.setItem('user', JSON.stringify(user));
+
+                // Set token in API client
+                apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
                 router.push('/');
             } catch (err) {
                 this.error = err.response?.data?.error || 'Login failed';

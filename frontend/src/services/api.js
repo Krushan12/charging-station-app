@@ -13,6 +13,12 @@ apiClient.interceptors.request.use(config => {
     if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
     }
+    console.log('API Request:', { 
+        url: config.url, 
+        method: config.method, 
+        data: config.data,
+        headers: config.headers 
+    });
     return config;
 }, error => {
     return Promise.reject(error);

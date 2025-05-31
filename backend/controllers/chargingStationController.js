@@ -70,22 +70,37 @@ exports.getChargingStation = async (req, res, next) => {
 // @route   POST /api/charging-stations
 // @access  Private
 exports.createChargingStation = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
+    console.log('Received data:', req.body);
+    
+    // Check validation results
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        error: errors.array().map(err => err.msg).join(', ')
+      });
+    }
+    
     // Add user to req.body
     req.body.createdBy = req.user.id;
     
-    // Convert location to GeoJSON Point
-    req.body.location = {
-      type: 'Point',
-      coordinates: [req.body.longitude, req.body.latitude]
+    // Format the data with explicit type conversions
+    const formattedData = {
+      name: req.body.name,
+      powerOutput: Number(req.body.powerOutput),
+      connectorType: req.body.connectorType,
+      status: req.body.status || 'available',
+      location: {
+        type: 'Point',
+        coordinates: req.body.location.coordinates.map(Number)
+      },
+      createdBy: req.user.id
     };
     
-    const chargingStation = await ChargingStation.create(req.body);
+    console.log('Formatted data:', formattedData);
+    
+    const chargingStation = await ChargingStation.create(formattedData);
     
     res.status(201).json({
       success: true,

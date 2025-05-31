@@ -42,38 +42,42 @@ exports.register = async (req, res, next) => {
 // @route   POST /api/auth/login
 // @access  Public
 exports.login = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { email, password } = req.body;
-
-  try {
-    // Check if user exists
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-      return res.status(401).json({ success: false, error: 'Invalid credentials' });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    // Check if password matches
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({ success: false, error: 'Invalid credentials' });
+    const { email, password } = req.body;
+
+    try {
+        // Check if user exists
+        const user = await User.findOne({ email }).select('+password');
+        if (!user) {
+            return res.status(401).json({ success: false, error: 'Invalid credentials' });
+        }
+
+        // Check if password matches
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            return res.status(401).json({ success: false, error: 'Invalid credentials' });
+        }
+
+        // Create token
+        const token = jwt.sign({ id: user._id }, jwtConfig.secret, {
+            expiresIn: jwtConfig.expire
+        });
+
+        // Remove password from response
+        user.password = undefined;
+
+        res.status(200).json({
+            success: true,
+            token,
+            data: user
+        });
+    } catch (err) {
+        next(err);
     }
-
-    // Create token
-    const token = jwt.sign({ id: user._id }, jwtConfig.secret, {
-      expiresIn: jwtConfig.expire
-    });
-
-    res.status(200).json({
-      success: true,
-      token
-    });
-  } catch (err) {
-    next(err);
-  }
 };
 
 // @desc    Get current logged in user

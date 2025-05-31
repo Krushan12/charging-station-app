@@ -12,16 +12,18 @@
           required 
           placeholder="Enter charger name"
         />
+        <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
       </div>
 
       <div class="form-group">
-        <label for="type">Charger Type</label>
-        <select id="type" v-model="formData.type" required>
-          <option value="">Select type</option>
+        <label for="connectorType">Connector Type</label>
+        <select id="connectorType" v-model="formData.connectorType" required>
+          <option disabled value="">Select type</option>
           <option value="Level 1">Level 1</option>
           <option value="Level 2">Level 2</option>
           <option value="DC Fast">DC Fast</option>
         </select>
+        <span v-if="errors.connectorType" class="error-message">{{ errors.connectorType }}</span>
       </div>
 
       <div class="form-group">
@@ -37,16 +39,17 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label for="power">Power (kW)</label>
+          <label for="powerOutput">Power Output (kW)</label>
           <input 
             type="number" 
-            id="power" 
-            v-model.number="formData.power" 
+            id="powerOutput" 
+            v-model.number="formData.powerOutput" 
             required 
-            min="0"
+            min="1"
             step="0.1"
             placeholder="Enter power in kW"
           />
+          <span v-if="errors.powerOutput" class="error-message">{{ errors.powerOutput }}</span>
         </div>
 
         <div class="form-group">
@@ -59,6 +62,35 @@
             min="0"
             step="0.01"
             placeholder="Enter price per hour"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="latitude">Latitude</label>
+          <input 
+            type="number" 
+            id="latitude" 
+            v-model.number="formData.latitude" 
+            required 
+            step="any"
+            min="-90"
+            max="90"
+            placeholder="Enter latitude"
+          />
+        </div>
+        <div class="form-group">
+          <label for="longitude">Longitude</label>
+          <input 
+            type="number" 
+            id="longitude" 
+            v-model.number="formData.longitude" 
+            required 
+            step="any"
+            min="-180"
+            max="180"
+            placeholder="Enter longitude"
           />
         </div>
       </div>
@@ -79,8 +111,8 @@
         <router-link to="/" class="cancel-btn">Cancel</router-link>
       </div>
 
-      <div v-if="chargerStore.error" class="error-message">
-        {{ chargerStore.error }}
+      <div v-if="errors.serverError || chargerStore.error" class="error-message">
+        {{ errors.serverError || chargerStore.error }}
       </div>
     </form>
   </div>
@@ -99,12 +131,34 @@ const isEditMode = computed(() => route.name === 'EditCharger');
 
 const formData = ref({
   name: '',
-  type: '',
+  connectorType: 'Level 1', // Set default value
   location: '',
-  power: 0,
+  powerOutput: 1, // Set minimum valid value
   pricePerHour: 0,
-  status: 'available'
+  status: 'available',
+  latitude: 0,
+  longitude: 0
 });
+
+const errors = ref({});
+
+const validateForm = () => {
+  errors.value = {};
+  
+  if (!formData.value.name?.trim()) {
+    errors.value.name = 'Please provide a name for the charging station';
+  }
+  
+  if (!formData.value.connectorType) {
+    errors.value.connectorType = 'Please select a connector type';
+  }
+  
+  if (!formData.value.powerOutput || formData.value.powerOutput < 1) {
+    errors.value.powerOutput = 'Power output must be at least 1 kW';
+  }
+  
+  return Object.keys(errors.value).length === 0;
+};
 
 onMounted(async () => {
   if (isEditMode.value) {
@@ -120,14 +174,48 @@ onMounted(async () => {
 
 const handleSubmit = async () => {
   try {
+    errors.value = {}; // Clear previous errors
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    // Convert and validate power output
+    const powerOutput = Number(formData.value.powerOutput);
+    if (isNaN(powerOutput) || powerOutput < 1) {
+      errors.value.powerOutput = 'Power output must be at least 1 kW';
+      return;
+    }
+
+    // Validate connector type
+    if (!['Level 1', 'Level 2', 'DC Fast'].includes(formData.value.connectorType)) {
+      errors.value.connectorType = 'Please select a valid connector type';
+      return;
+    }
+
+    const chargerData = {
+      name: formData.value.name.trim(),
+      powerOutput: powerOutput,
+      connectorType: formData.value.connectorType,
+      status: formData.value.status.toLowerCase(),
+      location: {
+        type: 'Point',
+        coordinates: [Number(formData.value.longitude), Number(formData.value.latitude)]
+      }
+    };
+
+    console.log('Prepared charger data:', chargerData);
+
+    console.log('Submitting charger data:', chargerData);
+
     if (isEditMode.value) {
-      await chargerStore.updateCharger(route.params.id, formData.value);
+      await chargerStore.updateCharger(route.params.id, chargerData);
     } else {
-      await chargerStore.addCharger(formData.value);
+      await chargerStore.addCharger(chargerData);
     }
     router.push('/');
   } catch (error) {
-    console.error('Error saving charger:', error);
+    console.error('Error saving charger:', error.response?.data || error);
   }
 };
 </script>
@@ -189,7 +277,8 @@ const handleSubmit = async () => {
 
 .error-message {
   color: #dc3545;
-  margin-top: 1rem;
-  text-align: center;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 </style>

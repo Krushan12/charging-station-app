@@ -21,10 +21,14 @@ router.post(
   '/',
   [
     check('name', 'Please add a name').not().isEmpty(),
-    check('latitude', 'Please include latitude').isFloat({ min: -90, max: 90 }),
-    check('longitude', 'Please include longitude').isFloat({ min: -180, max: 180 }),
     check('powerOutput', 'Please include power output in kW').isFloat({ min: 1 }),
-    check('connectorType', 'Please include connector type').not().isEmpty()
+    check('connectorType', 'Please include connector type').not().isEmpty().isIn(['Level 1', 'Level 2', 'DC Fast']),
+    check('location.type').equals('Point'),
+    check('location.coordinates').isArray().custom((coords) => {
+      if (!coords || coords.length !== 2) return false;
+      const [lng, lat] = coords;
+      return lng >= -180 && lng <= 180 && lat >= -90 && lat <= 90;
+    }).withMessage('Invalid coordinates. Must be [longitude, latitude] pair')
   ],
   chargingStationController.createChargingStation
 );

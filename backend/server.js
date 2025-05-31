@@ -54,16 +54,14 @@ app.use((err, req, res, next) => {
 });
 
 // Connect to MongoDB Atlas
-mongoose.connect(config.mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  retryWrites: true,
-  w: 'majority'
-})
+mongoose.connect(config.mongoURI, config.options)
 .then(() => console.log('Successfully connected to MongoDB Atlas'))
 .catch(err => {
   console.error('MongoDB connection error:', err);
-  console.error('Ensure your IP address is whitelisted in MongoDB Atlas.'); // Add this line
+  console.error('Please check:');
+  console.error('1. Your MongoDB Atlas IP whitelist');
+  console.error('2. Your connection string format');
+  console.error('3. Your database credentials');
   process.exit(1);
 });
 

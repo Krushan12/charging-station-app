@@ -7,16 +7,23 @@
       </router-link>
     </div>
 
-    <ChargerFilter @filter-changed="handleFilterChange" />
+    <ChargerFilter 
+      @filter-changed="handleFilterChange" 
+      :initial-filters="chargerStore.filters"
+    />
 
     <div v-if="chargerStore.loading" class="loading">
+      <span class="loading-spinner"></span>
       Loading chargers...
     </div>
     <div v-else-if="chargerStore.error" class="error">
       {{ chargerStore.error }}
     </div>
     <div v-else-if="filteredChargers.length === 0" class="no-results">
-      No chargers found.
+      <p>No chargers found matching your filters.</p>
+      <button class="clear-filters-btn" @click="clearFilters" v-if="hasActiveFilters">
+        Clear Filters
+      </button>
     </div>
     <div v-else class="charger-grid">
       <ChargerItem 
@@ -46,12 +53,24 @@ const filteredChargers = computed(() => {
   return chargerStore.filteredChargers();
 });
 
+const hasActiveFilters = computed(() => {
+  const filters = chargerStore.filters;
+  return filters.status !== '' || filters.type !== '' || filters.location !== '';
+});
+
 const handleFilterChange = (filters) => {
   chargerStore.filters = filters;
 };
 
+const clearFilters = () => {
+  chargerStore.filters = {
+    status: '',
+    type: '',
+    location: ''
+  };
+};
+
 const handleEdit = (id) => {
-  // Navigate to edit page
   router.push({ name: 'EditCharger', params: { id } });
 };
 
@@ -91,10 +110,50 @@ const handleDelete = async (id) => {
   text-align: center;
   padding: 2rem;
   font-size: 1.1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 .error {
   color: #dc3545;
+}
+
+.clear-filters-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.clear-filters-btn:hover {
+  background-color: #5a6268;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .charger-grid {

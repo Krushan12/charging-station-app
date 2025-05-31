@@ -30,6 +30,20 @@ router.post(
 );
 
 // @route   GET /api/auth/me
+// @desc    Get current user profile
+// @access  Private
+router.get('/me', protect, authController.getMe);
+// @access  Public
+router.post(
+  '/login',
+  [
+    check('email', 'Please include a valid email').isEmail(),
+    check('password', 'Password is required').exists()
+  ],
+  authController.login
+);
+
+// @route   GET /api/auth/me
 // @desc    Get current logged in user
 // @access  Private
 router.get('/me', protect, authController.getMe);  // Fix this line

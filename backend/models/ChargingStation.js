@@ -28,8 +28,8 @@ const chargingStationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Active', 'Inactive'],
-    default: 'Active'
+    enum: ['available', 'in-use', 'maintenance'],
+    default: 'available'
   },
   powerOutput: {
     type: Number,
@@ -39,7 +39,7 @@ const chargingStationSchema = new mongoose.Schema({
   connectorType: {
     type: String,
     required: [true, 'Please provide connector type'],
-    enum: ['Type1', 'Type2', 'CCS', 'CHAdeMO', 'Tesla']
+    enum: ['Level 1', 'Level 2', 'DC Fast']
   },
   createdBy: {
     type: mongoose.Schema.ObjectId,

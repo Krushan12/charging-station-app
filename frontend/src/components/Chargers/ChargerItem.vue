@@ -7,10 +7,10 @@
       </span>
     </div>
     <div class="charger-details">
-      <p><strong>Type:</strong> {{ charger.type }}</p>
-      <p><strong>Location:</strong> {{ charger.location }}</p>
-      <p><strong>Power (kW):</strong> {{ charger.power }}</p>
-      <p><strong>Price:</strong> ${{ charger.pricePerHour }}/hour</p>
+      <p><strong>Type:</strong> {{ charger.connectorType }}</p>
+      <p><strong>Location:</strong> {{ formatLocation(charger.location) }}</p>
+      <p><strong>Power (kW):</strong> {{ charger.powerOutput }}</p>
+      <p><strong>Price:</strong> ${{ charger.pricePerHour || 0 }}/hour</p>
     </div>
     <div class="charger-actions">
       <button @click="handleEdit" class="edit-btn">Edit</button>
@@ -28,6 +28,12 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['edit', 'delete']);
+
+const formatLocation = (location) => {
+  if (!location || !location.coordinates) return 'N/A';
+  const [longitude, latitude] = location.coordinates;
+  return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+};
 
 const handleEdit = () => {
   emit('edit', props.charger._id);
@@ -94,6 +100,16 @@ const handleDelete = () => {
 
 .charger-details p {
   margin: 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px dashed #eee;
+  padding: 0.25rem 0;
+}
+
+.charger-details p strong {
+  color: #666;
+  min-width: 100px;
 }
 
 .charger-actions {
