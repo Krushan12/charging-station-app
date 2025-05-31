@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, onBeforeUnmount } from 'vue';
 import { useChargerStore } from '../stores/charger.store';
 import LocationSearch from '../components/Map/LocationSearch.vue';
 import ChargerSearch from '../components/Map/ChargerSearch.vue';
@@ -44,19 +44,28 @@ const handleChargerSelect = ({ lat, lng, charger }) => {
   }
 };
 
-onMounted(() => {
-  // Initialize the map
-  map = L.map('leaflet-map', {
-    center: [20.5937, 78.9629], // India center
-    zoom: 5,
-    language: 'en' // Set language to English
-  });
+onBeforeUnmount(() => {
+  if (map) {
+    map.remove();
+    map = null;
+  }
+});
 
-  // Add tile layer with English labels
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    maxZoom: 18
-  }).addTo(map);
+onMounted(() => {
+  // Initialize the map only if it doesn't exist
+  if (!map) {
+    map = L.map('leaflet-map', {
+      center: [20.5937, 78.9629], // India center
+      zoom: 5
+    });
+
+    // Add tile layer with English labels using OSM Carto
+    L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 18,
+      subdomains: 'abc'
+    }).addTo(map);
+  }
 
   // Load chargers
   chargerStore.fetchChargers().then(() => {
@@ -162,19 +171,14 @@ onMounted(() => {
   margin-bottom: 12px;
 }
 
-.charger-popup-status.available {
-  background-color: #d4edda;
-  color: #155724;
+.charger-popup-status.active {
+  background-color: #d1fae5;
+  color: #065f46;
 }
 
-.charger-popup-status.in-use {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.charger-popup-status.maintenance {
-  background-color: #f8d7da;
-  color: #721c24;
+.charger-popup-status.inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 .charger-popup-details p {
