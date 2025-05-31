@@ -40,6 +40,11 @@ app.use(morgan('dev'));
 app.use('/api/auth', authRoutes);
 app.use('/api/charging-stations', chargingStationRoutes);
 
+// Add base route for API health check
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Add a route handler for the root path
 app.get('/', (req, res) => {
   res.send('Charging Station Backend is running!');
@@ -50,6 +55,14 @@ app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // Add a route handler for Chrome DevTools request
 app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => res.status(204).end());
+
+// Add catch-all route for unknown API endpoints
+app.all('/api/*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: `Cannot ${req.method} ${req.originalUrl}`
+  });
+});
 
 // 404 handler
 app.use((req, res, next) => {
