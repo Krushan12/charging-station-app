@@ -121,6 +121,13 @@ onMounted(() => {
   transition: all 0.3s ease;
 }
 
+@media (max-width: 768px) {
+  .map-page {
+    margin: 8px;
+    height: calc(100vh - 72px);
+  }
+}
+
 .search-box {
   padding: 16px 24px;
   background: white;
@@ -128,10 +135,23 @@ onMounted(() => {
   z-index: 1000;
 }
 
+@media (max-width: 768px) {
+  .search-box {
+    padding: 12px;
+  }
+}
+
 .search-container {
   display: flex;
   gap: 12px;
   align-items: flex-start;
+}
+
+@media (max-width: 640px) {
+  .search-container {
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 
 .search-container > * {

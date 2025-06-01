@@ -43,17 +43,24 @@ const handleDelete = () => {
 };
 </script>
 
-<style>
+<style scoped>
 .charger-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 480px) {
+  .charger-card {
+    padding: 1rem;
+  }
 }
 
 .charger-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .charger-header {
@@ -61,19 +68,27 @@ const handleDelete = () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .charger-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 }
 
 .charger-header h3 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  color: #1f2937;
 }
 
 .status-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
   font-weight: 500;
   text-transform: capitalize;
 }
@@ -81,17 +96,15 @@ const handleDelete = () => {
 .status-badge.active {
   background-color: #d1fae5;
   color: #065f46;
-  border: 1px solid #34d399;
 }
 
 .status-badge.inactive {
   background-color: #fee2e2;
   color: #991b1b;
-  border: 1px solid #f87171;
 }
 
 .charger-details {
-  margin-bottom: 1rem;
+  margin: 1rem 0;
 }
 
 .charger-details p {
@@ -99,35 +112,60 @@ const handleDelete = () => {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  border-bottom: 1px dashed #eee;
+  color: #4b5563;
   padding: 0.25rem 0;
 }
 
-.charger-details p strong {
-  color: #666;
-  min-width: 100px;
+@media (max-width: 480px) {
+  .charger-details p {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+.charger-details strong {
+  color: #374151;
+  font-weight: 500;
 }
 
 .charger-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
 }
 
-.edit-btn {
-  background-color: #ffc107;
-  color: #212529;
-}
-
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
+@media (max-width: 480px) {
+  .charger-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 
 button {
   flex: 1;
-  padding: 0.5rem;
+  padding: 0.625rem 1rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-btn {
+  background-color: #fbbf24;
+  color: #92400e;
+}
+
+.edit-btn:hover {
+  background-color: #f59e0b;
+}
+
+.delete-btn {
+  background-color: #ef4444;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #dc2626;
 }
 </style>

@@ -92,54 +92,10 @@ watch(() => props.initialFilters, (newFilters) => {
 .charger-filter {
   display: flex;
   gap: 1.5rem;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background-color: #f8f9fa;
+  padding: 1rem;
+  background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-label {
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #495057;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.form-select, .form-input {
-  padding: 0.75rem;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  background-color: white;
-  min-width: 200px;
-  cursor: pointer;
-  font-size: 1rem;
-  color: #495057;
-  background-color: white;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.form-select:focus, .form-input:focus {
-  outline: none;
-  border-color: #80bdff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.form-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1em;
-  padding-right: 2.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
@@ -147,9 +103,49 @@ label {
     flex-direction: column;
     gap: 1rem;
   }
+}
 
-  .filter-group {
-    margin-bottom: 0.5rem;
+.filter-group {
+  flex: 1;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.form-select:hover {
+  border-color: #d1d5db;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+@media (max-width: 480px) {
+  .charger-filter {
+    padding: 0.75rem;
+  }
+
+  .form-select {
+    padding: 0.5rem;
+    font-size: 0.875rem;
   }
 }
 </style>
