@@ -343,21 +343,37 @@ Here are some example screenshots of API requests made in Postman:
 #### Authentication
 
 1. **Register New User**
-![Register API](https://github.com/krushant/charging-station-app/assets/screenshots/POST_Register.png)
+![Register API](/charging-station-app/assets/screenshots/POST_Register.png)
+- Route: POST `/api/auth/register`
+- Creates a new user account and returns JWT token
 
 2. **Login User**
-![Login API](https://github.com/krushant/charging-station-app/assets/screenshots/POST_Login.png)
+![Login API](/charging-station-app/assets/screenshots/POST_Login.png)
+- Route: POST `/api/auth/login`
+- Authenticates user and returns JWT token
 
 #### Charging Stations
 
 1. **List All Charging Stations**
-![Get Chargers API](https://github.com/krushant/charging-station-app/assets/screenshots/GET_Read.png)
+![Get Chargers API](/charging-station-app/assets/screenshots/GET_Read.png)
+- Route: GET `/api/charging-stations`
+- Returns list of all charging stations with optional filters
 
 2. **Create New Charging Station**
-![Create Charger API](https://github.com/krushant/charging-station-app/assets/screenshots/Post_ChargerStation.png)
+![Create Charger API](/charging-station-app/assets/screenshots/Post_ChargerStation.png)
+- Route: POST `/api/charging-stations`
+- Creates a new charging station
 
 3. **Update Charging Station**
-![Update Charger API](https://github.com/krushant/charging-station-app/assets/screenshots/POST_Update.png)
+![Update Charger API](/charging-station-app/assets/screenshots/POST_Update.png)
+- Route: PUT `/api/charging-stations/:id`
+- Updates an existing charging station
+
+Each screenshot shows:
+- Request URL
+- Headers (including Authorization token where required)
+- Request body format
+- Example response
 
 Note: Make sure to include the Authorization token in the headers for all charging station endpoints.
 
