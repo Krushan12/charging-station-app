@@ -151,16 +151,214 @@ npm run build
 - CORS protection
 
 
-## 👨‍💻 Developer
+## 📚 API Documentation with Postman Examples
 
-This project was developed as part of a 5-day full-stack development assignment, demonstrating proficiency in:
-- Full-stack JavaScript development
-- Modern frontend frameworks
-- RESTful API design
-- Database modeling
-- Cloud deployment
-- Security implementation
-- Map integration
-- Responsive design
+### Authentication Endpoints
+
+1. **Register User**
+```json
+POST /api/auth/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "email": "test@example.com",
+    "password": "password123"
+}
+
+// Success Response (201 Created)
+{
+    "success": true,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "data": {
+        "id": "user_id",
+        "username": "testuser",
+        "email": "test@example.com"
+    }
+}
+```
+
+2. **Login User**
+```json
+POST /api/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "password123"
+}
+
+// Success Response (200 OK)
+{
+    "success": true,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "data": {
+        "id": "user_id",
+        "email": "test@example.com",
+        "username": "testuser"
+    }
+}
+```
+
+### Charging Station Endpoints
+
+1. **Create Charging Station**
+```json
+POST /api/charging-stations
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "name": "Test Charger",
+    "location": {
+        "type": "Point",
+        "coordinates": [72.8311, 21.1702]
+    },
+    "status": "active",
+    "powerOutput": 50,
+    "connectorType": "Level 2"
+}
+
+// Success Response (201 Created)
+{
+    "success": true,
+    "data": {
+        "_id": "station_id",
+        "name": "Test Charger",
+        "location": {
+            "type": "Point",
+            "coordinates": [72.8311, 21.1702]
+        },
+        "status": "active",
+        "powerOutput": 50,
+        "connectorType": "Level 2",
+        "createdAt": "2023-12-21T12:00:00.000Z"
+    }
+}
+```
+
+2. **Update Charging Station**
+```json
+PUT /api/charging-stations/{station_id}
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "name": "Updated Charger Name",
+    "location": {
+        "type": "Point",
+        "coordinates": [72.8311, 21.1702]
+    },
+    "status": "inactive",
+    "powerOutput": 75,
+    "connectorType": "Level 2"
+}
+
+// Success Response (200 OK)
+{
+    "success": true,
+    "data": {
+        "_id": "station_id",
+        "name": "Updated Charger Name",
+        "location": {
+            "type": "Point",
+            "coordinates": [72.8311, 21.1702]
+        },
+        "status": "inactive",
+        "powerOutput": 75,
+        "connectorType": "Level 2",
+        "updatedAt": "2023-12-21T12:00:00.000Z"
+    }
+}
+
+```
+
+3. **Get All Charging Stations**
+```json
+GET /api/charging-stations
+Authorization: Bearer {token}
+
+// Optional Query Parameters:
+?status=active
+&connectorType=Level 2
+&powerOutput=50
+
+// Success Response (200 OK)
+{
+    "success": true,
+    "count": 1,
+    "data": [
+        {
+            "_id": "station_id",
+            "name": "Test Charger",
+            "location": {
+                "type": "Point",
+                "coordinates": [72.8311, 21.1702]
+            },
+            "status": "active",
+            "powerOutput": 50,
+            "connectorType": "Level 2"
+        }
+    ]
+}
+```
+
+4. **Delete Charging Station**
+```json
+DELETE /api/charging-stations/{station_id}
+Authorization: Bearer {token}
+
+// Success Response (200 OK)
+{
+    "success": true,
+    "data": {}
+}
+```
+
+### Important Notes:
+
+1. **Authentication**:
+   - All charging station endpoints require JWT token in Authorization header
+   - Token format: `Bearer eyJhbGciOiJIUzI1NiIs...`
+   - Token is obtained from login/register response
+
+2. **Required Fields**:
+   - For POST and PUT requests, all fields are required:
+     - name (string)
+     - location.coordinates (array of [longitude, latitude])
+     - status (string: "active" or "inactive")
+     - powerOutput (number)
+     - connectorType (string: "Level 1", "Level 2", or "DC Fast")
+
+3. **Error Handling**:
+   - 400: Bad Request (Invalid data or missing fields)
+   - 401: Unauthorized (Missing or invalid token)
+   - 404: Not Found (Invalid station ID)
+   - 500: Server Error
+
+### 📸 Postman API Examples
+
+Here are some example screenshots of API requests made in Postman:
+
+#### Authentication
+
+1. **Register New User**
+![Register API](https://github.com/krushant/charging-station-app/assets/screenshots/POST_Register.png)
+
+2. **Login User**
+![Login API](https://github.com/krushant/charging-station-app/assets/screenshots/POST_Login.png)
+
+#### Charging Stations
+
+1. **List All Charging Stations**
+![Get Chargers API](https://github.com/krushant/charging-station-app/assets/screenshots/GET_Read.png)
+
+2. **Create New Charging Station**
+![Create Charger API](https://github.com/krushant/charging-station-app/assets/screenshots/Post_ChargerStation.png)
+
+3. **Update Charging Station**
+![Update Charger API](https://github.com/krushant/charging-station-app/assets/screenshots/POST_Update.png)
+
+Note: Make sure to include the Authorization token in the headers for all charging station endpoints.
 
 
